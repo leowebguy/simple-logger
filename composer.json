@@ -1,0 +1,64 @@
+{
+  "name": "leowebguy/simple-logger",
+  "description": "Collect brief logs from exception handlers and report",
+  "keywords": [
+    "craftcms",
+    "plugin",
+    "logs",
+    "logger",
+    "exceptions",
+    "report",
+    "monolog"
+  ],
+  "version": "1.0.0",
+  "type": "craft-plugin",
+  "license": "MIT",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "authors": [
+    {
+      "name": "Leo",
+      "homepage": "https://github.com/leowebguy"
+    }
+  ],
+  "require": {
+    "craftcms/cms": "^4.0",
+    "monolog/monolog": "^2.7.0",
+    "php": "^8.0"
+  },
+  "require-dev": {
+    "craftcms/ecs": "dev-main",
+    "craftcms/phpstan": "dev-main",
+    "craftcms/rector": "dev-main"
+  },
+  "autoload": {
+    "psr-4": {
+      "leowebguy\\simplelogger\\": "src/"
+    }
+  },
+  "extra": {
+    "name": "Simple Logger",
+    "handle": "simple-logger",
+    "hasCpSection": false,
+    "hasCpSettings": false,
+    "class": "leowebguy\\simplelogger\\SimpleLogger",
+    "components": {
+      "loggerService": "leowebguy\\simplelogger\\services\\LoggerService"
+    }
+  },
+  "config": {
+    "platform": {
+      "php": "8.0.2"
+    },
+    "allow-plugins": {
+      "yiisoft/yii2-composer": true,
+      "craftcms/plugin-installer": true
+    }
+  },
+  "scripts": {
+    "check-cs": "vendor/bin/ecs check src --ansi",
+    "fix-cs": "vendor/bin/ecs check src --ansi --fix",
+    "phpstan": "vendor/bin/phpstan analyse src",
+    "rector": "vendor/bin/rector process src --config vendor/craftcms/rector/sets/craft-cms-40.php"
+  }
+}
