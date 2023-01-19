@@ -12,11 +12,12 @@ namespace leowebguy\simplelogger;
 
 use Craft;
 use craft\base\Plugin;
+use craft\console\Application as ConsoleApplication;
 use craft\events\RegisterTemplateRootsEvent;
 use craft\helpers\App;
 use craft\events\ExceptionEvent;
+use craft\helpers\FileHelper;
 use craft\web\ErrorHandler;
-use DateTime;
 use yii\base\Event;
 use craft\web\View;
 
@@ -41,6 +42,15 @@ class SimpleLogger extends Plugin
         }
 
         /**
+         * ConsoleApplication
+         */
+        if (Craft::$app instanceof ConsoleApplication) {
+            $this->controllerNamespace = 'leowebguy\simplelogger\console\controllers';
+        }else {
+            $this->controllerNamespace = 'leowebguy\simplelogger\controllers';
+        }
+
+        /**
          * Exception handler
          */
         if (App::env('LOGGER_ON')) {
@@ -48,11 +58,30 @@ class SimpleLogger extends Plugin
                 ErrorHandler::class,
                 ErrorHandler::EVENT_BEFORE_HANDLE_EXCEPTION,
                 function(ExceptionEvent $event) {
-                    $this->loggerService->handleException($event->exception);
+                    
+                    $statusCode = $event->exception->statusCode;
+                    $statusCode = 500;
+                    //Check if status code !== (400, 404)
+                    if(!preg_match("/(404|400)/i", $statusCode)){
+                        //Write Log Exception
+                        $this->loggerService->handleException($event->exception);
 
-                    // if between 6am and 7am
-                    if (in_array((int)date('H'), [6, 7])) {
-                        $this->loggerService->sendReport();
+                        //Write text for email one time for day
+                        $logfile = Craft::$app->path->getLogPath() . '/execute/executionlogger.log';
+                        $date = date("Y-m-d H:i:s");
+                        if (!file_exists($logfile)) {
+                            FileHelper::writeToFile($logfile, $date);
+                        }
+                        
+                        $dayLog = date('d', filemtime($logfile)); 
+                        $currentDay = date("d",strtotime($date));
+                        $hourDay = ltrim(date("h",strtotime($date)), '0');;
+                        // check 8am - 9am
+                        if (@file_exists($logfile) && ( $currentDay > $dayLog  &&  in_array($hourDay, array('8', '9') ))) {
+                            
+                            $this->loggerService->sendReport();
+                            @file_put_contents($logfile, $date);
+                        }
                     }
                 }
             );
@@ -65,7 +94,7 @@ class SimpleLogger extends Plugin
             View::class,
             View::EVENT_REGISTER_SITE_TEMPLATE_ROOTS,
             static function(RegisterTemplateRootsEvent $event) {
-                $event->roots['_simplelogger'] = __DIR__ . '/templates';
+                $event->roots['_simple-logger'] = __DIR__ . '/templates';
             }
         );
 

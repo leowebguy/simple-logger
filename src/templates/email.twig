@@ -3,132 +3,49 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="x-apple-disable-message-reformatting">
-    <title></title>
     <style>
-        html,
-        body {
-            margin: 0 auto !important;
-            padding: 0 !important;
-            height: 100% !important;
-            width: 100% !important;
-            background: #ffffff;
-        }
-
-        * {
-            -ms-text-size-adjust: 100%;
-            -webkit-text-size-adjust: 100%;
-        }
-
-        *[x-apple-data-detectors], /* iOS */
-        .unstyle-auto-detected-links *,
-        .aBn {
-            border-bottom: 0 !important;
-            cursor: default !important;
-            color: inherit !important;
-            text-decoration: none !important;
-            font-size: inherit !important;
-            font-family: inherit !important;
-            font-weight: inherit !important;
-            line-height: inherit !important;
-        }
-
-        .a6S {
-            display: none !important;
-            opacity: 0.01 !important;
-        }
-
-        .im {
-            color: inherit !important;
-        }
-
-        /* iPhone 4, 4S, 5, 5S, 5C, and 5SE */
-        @media only screen and (min-device-width: 320px) and (max-device-width: 374px) {
-            u ~ div .email-container {
-                min-width: 320px !important;
-            }
-        }
-
-        /* iPhone 6, 6S, 7, 8, and X */
-        @media only screen and (min-device-width: 375px) and (max-device-width: 413px) {
-            u ~ div .email-container {
-                min-width: 375px !important;
-            }
-        }
-
-        /* iPhone 6+, 7+, and 8+ */
-        @media only screen and (min-device-width: 414px) {
-            u ~ div .email-container {
-                min-width: 414px !important;
-            }
-        }
-
         table {
-            width: 100% !important;
-            border-spacing: 0 !important;
-            border-collapse: collapse !important;
-            table-layout: fixed !important;
-            margin: 0 auto !important;
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 50%;
+            border: 1px solid #ddd;
+            margin-left: 5%;
+            margin-right: auto;
         }
 
-        table,
-        td {
-            mso-table-lspace: 0 !important;
-            mso-table-rspace: 0 !important;
+        th, td {
+            text-align: left;
+            padding: 8px;
         }
-
-        h2, h4, h5 {
-            color: #212121;
-            font-weight: bold;
+        .title-table {
+            font-weight: 700;
         }
-        h2 {
-            font-size: 24px;
-            margin-bottom: 12px;
-        }
-        h4 {
-            font-size: 20px;
-            margin-bottom: 10px;
-        }
-        h5 {
+        .description-table {
+            margin-left: 5%;
             font-size: 16px;
-            margin-bottom: 8px;
         }
-        p {
-            color: #212121;
-            margin-bottom: 8px;
-        }
+        tr:nth-child(even){background-color: #f2f2f2}
     </style>
+    <title></title>
+    
 </head>
-
-<body style="margin: 0; padding: 0 !important; mso-line-height-rule: exactly;">
-<div style="max-width: 768px;" class="email-container">
-    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-        <tr>
-            <td style="padding: 3em;">
-                <div class="text" style="padding: 3em; border: solid 1px">
-                    <div class="form wrapper-page">
-                        <!-- start content -->
-
-                        <h3>Hello,</h3>
-                        <p>A new form has been posted on {{ data.site }}</p>
-
-                        <br>
-
-                        <div class="field">
-                            <h4>Referrer Information</h4>
-                            <span>Name:</span> {{ data.referrer.firstName }} {{ data.referrer.lastName }}<br>
-                            <span>Job Title:</span> {{ data.referrer.jobTitle }}<br>
-                            <span>Agency:</span> {{ data.referrer.agency }}<br>
-                            <span>Phone:</span> {{ data.referrer.phone }}
-                        </div>
-
-                        <!-- end content -->
-                    </div>
-                </div>
-            </td>
-        </tr>
-    </table>
-</div>
-</body>
+    <body>
+        <div style="overflow-x:auto;">
+            <table>
+                <tbody>
+                    <tr>
+                        <td class="title-table"><span>Download and open the attachment to view the last day log errors</span></td>
+                    </tr>
+                    <tr>
+                        <td class="title-table"><span>Log Error Information Date {{ "now"|date("m/d/Y") }}</span></td>
+                    </tr>
+                    <tr>
+                        <td class="title-table"><span>Send by Simple Logger</span></td>
+                    </tr>
+                </tbody>
+            </table>                        
+        </div>
+    </body>
 </html>

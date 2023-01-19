@@ -18,6 +18,8 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use craft\base\Component;
+use craft\base\Plugin;
+use craft\console\controllers\UsersController;
 use craft\elements\User;
 use craft\helpers\App;
 use craft\helpers\FileHelper;
@@ -41,11 +43,15 @@ class LoggerService extends Component
      */
     public function handleException($exception): void
     {
+
         $handler = new SimpleHandler(Logger::ERROR, true);
+        
         $handler->setFormatter(new NormalizerFormatter('Y-m-d H:i:s'));
         $local = new Logger(Craft::$app->sites->currentSite->name);
         $local->pushHandler($handler);
         $local->error($exception);
+        
+
     }
 
     /**
@@ -56,24 +62,27 @@ class LoggerService extends Component
      */
     public function writeException($data): void
     {
-        $path = Craft::$app->path->getLogPath();
+
+        $path = Craft::$app->path->getLogPath(). '/email-log';
+        
 
         if (!FileHelper::isWritable($path)) {
             Craft::error('Can\'t write into getLogPath()' . $path, __METHOD__);
             die();
-        }
+        } 
 
-        $logfile = 'simplelogger.log';
-
+        $logfile = '/simplelogger.log';
+        
         if (!file_exists($path . $logfile)) {
             FileHelper::writeToFile($path . $logfile, '');
         }
 
         $json = file_get_contents($path . $logfile);
+
         $array = Json::decode($json);
         $array[] = $data;
-
         FileHelper::writeToFile($path . $logfile, Json::encode($array), ['append']);
+
     }
 
     /**
@@ -81,17 +90,15 @@ class LoggerService extends Component
      * @throws BaseException
      */
     public function sendReport(): void
-    {
-        $logfile = Craft::$app->path->getLogPath() . '/simplelogger.log';
-
+    {   
+        $logfile = Craft::$app->path->getLogPath() . '/email-log/simplelogger.log';
+        echo $logfile. "\n";
         if (!file_exists($logfile)) {
             Craft::error('Can\'t find ' . $logfile, __METHOD__);
             die();
         }
-
         $json = file_get_contents($logfile);
         $data = Json::decode($json);
-
         try {
             $this->createEmail($data);
         } catch (Exception $e) {
@@ -113,17 +120,23 @@ class LoggerService extends Component
      */
     private function createEmail($data): void
     {
-        $recipients = explode(',', preg_replace('/\s+/', '', App::env('LOGGER_EMAIL'))) ?? $this->getAdminEmails();
-        $subject = 'Simple Logger Report';
-
-        // get the html email template
-        $html = Craft::$app->getView()->renderTemplate('_healthfirstrefer/email', ['data' => $data]); //, 'pdf' => $pdf
+        
+        $recipients = explode(',', preg_replace('/\s+/', '', App::env('LOGGER_EMAIL')));
+        if(isset($recipients[0]) && $recipients[0] == ''){
+            $recipients = $this->getAdminEmails();
+        }else {
+            $recipients = App::env('LOGGER_EMAIL');
+        }
+        $subject = 'Simple Logger Report'. "\n";
+        //Template for send Email Log
+        $html = Craft::$app->getView()->renderTemplate('_simple-logger/email');
 
         foreach ($recipients as $recipient) {
-            try {
+
+            try { 
                 $this->sendMail($html, $subject, $recipient);
             } catch (Exception $e) {
-                Craft::error($e->getMessage(), __METHOD__);
+                echo Craft::error($e->getMessage(), __METHOD__);
                 return; // << do not throw, prevent loop
             }
         }
@@ -136,14 +149,17 @@ class LoggerService extends Component
      * @return void
      * @throws InvalidConfigException
      */
-    private function sendMail(string $html, string $subject, $mail): void
+    public function sendMail(string $html, string $subject, $mail): void
     {
+        $attachLogFile = Craft::$app->path->getLogPath() . '/email-log/simplelogger.log';
         $mailer = Craft::$app->getMailer()->compose()
             ->setTo($mail)
             ->setSubject($subject)
-            ->setHtmlBody($html);
-
-        $mailer->send();
+            ->setHtmlBody($html)
+            ->attach($attachLogFile);
+            if($mailer->send()){
+                unlink($attachLogFile);
+            }
     }
 
     /**
@@ -154,12 +170,13 @@ class LoggerService extends Component
         $admins = User::find()
             ->admin()
             ->all();
-
+        
         $emails = [];
         foreach ($admins as $admin) {
             $emails[] = $admin->email;
         }
-
         return $emails;
     }
+
+    
 }
