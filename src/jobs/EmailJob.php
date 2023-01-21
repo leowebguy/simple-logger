@@ -16,14 +16,14 @@ use leowebguy\simplelogger\SimpleLogger;
 
 class EmailJob extends BaseJob
 {
-    public string $recipient;
+    public array $to;
 
     /**
      * @return string
      */
     public function defaultDescription(): string
     {
-        return 'Sending Simple Logger Reports';
+        return 'Sending Simple Logger Report';
     }
 
     /**
@@ -32,6 +32,6 @@ class EmailJob extends BaseJob
      */
     public function execute($queue): void
     {
-        SimpleLogger::getInstance()->loggerService->sendMail($this->recipient);
+        SimpleLogger::getInstance()->loggerService->sendMail($this->to);
     }
 }

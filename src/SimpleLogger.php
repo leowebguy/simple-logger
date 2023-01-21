@@ -52,18 +52,18 @@ class SimpleLogger extends Plugin
                 function(ExceptionEvent $event) {
 
                     // Check if status code !== (400, 404)
-                    if (preg_match("/(404|400)/i", $event->exception->statusCode)) {
+                    if (preg_match("/(404)/i", $event->exception->getCode())) {
                         return;
                     }
 
                     // Write Log Exception
                     $this->loggerService->handleException($event->exception);
 
-                    // Write text for email one time a day
-                    $logfile = Craft::$app->path->getLogPath() . '/simplelogger';
-
                     // Test only
                     //$this->loggerService->sendReport();
+
+                    // Write text for email one time a day
+                    $logfile = Craft::$app->path->getLogPath() . '/simplelogger';
 
                     if (!@file_exists($logfile)) {
                         @file_put_contents($logfile, '.');

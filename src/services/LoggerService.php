@@ -13,7 +13,7 @@ namespace leowebguy\simplelogger\services;
 
 use Craft;
 use Exception;
-use Monolog\Formatter\NormalizerFormatter;
+use Monolog\Formatter\LineFormatter;
 use Monolog\Logger;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -42,8 +42,8 @@ class LoggerService extends Component
      */
     public function handleException($exception): void
     {
-        $handler = new SimpleHandler(Logger::ERROR, true);
-        $handler->setFormatter(new NormalizerFormatter('Y-m-d H:i:s'));
+        $handler = new SimpleHandler(Logger::ERROR, true, $exception->getCode());
+        $handler->setFormatter(new LineFormatter('Y-m-d H:i:s'));
         $local = new Logger(Craft::$app->sites->currentSite->name);
         $local->pushHandler($handler);
         $local->error($exception);
@@ -76,21 +76,33 @@ class LoggerService extends Component
      */
     public function sendReport(): void
     {
-        $recipients = explode(',', preg_replace('/\s+/', '', App::env('LOGGER_EMAIL')));
+        $to = [];
+        $rec = explode(',', preg_replace('/\s+/', '', App::env('LOGGER_EMAIL') ?? ''));
 
-        if (isset($recipients[0]) && $recipients[0] == '') {
-            $recipients = $this->getAdminEmails();
+        // array(1) { ["aaa@gmail.com"]=> string(0) "" }
+        if (count($rec) == 1 && !empty($rec[0])) {
+            $to[$rec[0]] = '';
         }
 
-        foreach ($recipients as $recipient) {
-            try {
-                Queue::push(new EmailJob([
-                    'recipient' => $recipient
-                ]));
-            } catch (Exception $e) {
-                Craft::error($e->getMessage(), __METHOD__);
-                return; // << do not throw, prevent loop
+        // array(1) { ["aaa@gmail.com"]=> string(0) "" }
+        if (empty($rec[0])) {
+            $to = $this->getAdminEmails();
+        }
+
+        // array(2) { ["aaa@gmail.com"]=> string(0) "" ["bbb@gmail.com"]=> string(0) "" }
+        if (count($rec) > 1) {
+            foreach ($rec as $r) {
+                $to[$r] = '';
             }
+        }
+
+        try {
+            Queue::push(new EmailJob([
+                'to' => $to
+            ]));
+        } catch (Exception $e) {
+            Craft::error($e->getMessage(), __METHOD__);
+            return; // << do not throw, prevent loop
         }
     }
 
@@ -98,7 +110,7 @@ class LoggerService extends Component
     // =========================================================================
 
     /**
-     * @param $mail
+     * @param $to
      * @return void
      * @throws BaseException
      * @throws InvalidConfigException
@@ -106,7 +118,7 @@ class LoggerService extends Component
      * @throws RuntimeError
      * @throws SyntaxError
      */
-    public function sendMail($mail): void
+    public function sendMail($to): void
     {
         $logfile = Craft::$app->path->getLogPath() . '/simplelogger.json';
 
@@ -115,17 +127,20 @@ class LoggerService extends Component
             die();
         }
 
+        $json = @file_get_contents($logfile);
+        $logs = Json::decode($json);
+
         // Set subject
         $subject = 'Simple Logger Report | ' . date("m-d");
 
         // Template for send Email Log
-        $html = Craft::$app->getView()->renderTemplate('_simplelogger/email');
+        $html = Craft::$app->getView()->renderTemplate('_simplelogger/email', ['logs' => $logs]);
 
         $mailer = Craft::$app->getMailer()->compose()
-            ->setTo($mail)
+            ->setTo($to)
             ->setSubject($subject)
-            ->setHtmlBody($html)
-            ->attach($logfile);
+            ->setHtmlBody($html);
+            //->attach($logfile);
 
         // Clear log
         if ($mailer->send()) {
@@ -142,10 +157,10 @@ class LoggerService extends Component
             ->admin()
             ->all();
 
-        $emails = [];
+        $to = [];
         foreach ($admins as $admin) {
-            $emails[] = $admin->email;
+            $to[$admin->email] = '';
         }
-        return $emails;
+        return $to;
     }
 }

@@ -6,24 +6,41 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="x-apple-disable-message-reformatting">
     <title></title>
-    <style>
-        html, body {font-size: 16px;-webkit-text-size-adjust: 100%;height: 100%;font-family: system-ui, BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;}  body {margin: 0;padding: 0;background-color: hsl(212, 60%, 97%);color: hsl(209, 18%, 30%);display: flex;}  * {-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;}  h3, h4, p {margin-top: 0;margin-bottom: 12px;}  h3 {font-size: 1.6rem;}  h4 {font-size: 1.2rem;}  a {text-decoration: none;}  small {font-size: .7rem;}  .email {padding: 22px;}
-    </style>
+    <style> html, body {font-size: 14px;-webkit-text-size-adjust: 100%;height: 100%;font-family: system-ui, BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;}  body {margin: 0;padding: 0;background-color: hsl(212, 60%, 97%);color: hsl(209, 18%, 30%);display: flex;}  * {-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;}  h3, h4, p {margin-top: 0;margin-bottom: 12px;}  h3 {font-size: 1.6rem;}  h4 {font-size: 1.2rem;}  a {text-decoration: none;}  small {font-size: .7rem;}  table {border-collapse: collapse;width: 100%;}  table td {padding: 12px;}  table.table1 thead td, table.table1 tfoot td {background-color: #54585d;color: #ffffff;font-weight: bold;border: 1px solid #54585d;}  table.table1 tbody td {color: #636363;border: 1px solid #dddfe1;}  table tbody tr {background-color: #f9fafb;}  table.table1 td:first-child, table.table1 th:first-child {text-align: left;}  table.table1 td:last-child, table.table1 th:last-child {text-align: right;width: 3em;}  table.table1 tbody tr:nth-child(odd) {background-color: #ffffff;}  .email {padding: 22px;}</style>
 </head>
 <body>
 <div style="max-width: 760px;">
     <div class="email" style="padding: 22px;">
         <!-- start content -->
 
-        <h4>{{ 'Simple Logger Exceptions reports'|t }},</h4>
+        <h4>{{ 'Simple Logger Exceptions reports'|t }}</h4>
 
-        <br>
-
-        <p>{{ 'Find attached Simple Logger Exceptions report in JSON format from previous day.'|t }}</p>
+        <table class="table1">
+            <thead>
+            <tr>
+                <td>{{ 'time'|t }}</td>
+                <td>{{ 'code'|t }}</td>
+                <td>{{ 'level_name'|t }}</td>
+                <td>{{ 'sourcetype'|t }}</td>
+                <td>{{ 'message'|t }}</td>
+            </tr>
+            </thead>
+            <tbody>
+            {% for log in logs %}
+            <tr>
+                <td>{{ log.time }}</td>
+                <td>{{ log.code }}</td>
+                <td>{{ log.level_name }}</td>
+                <td>{{ log.sourcetype }}</td>
+                <td>{{ log.message }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
         <br><br>
 
-        <small>{{ 'Simple Logger' }}</small>
+        <small><a href="https://plugins.craftcms.com/simple-logger?craft4">{{ 'by Simple Logger' }}</a></small>
 
         <br><br><br><br>&nbsp;
 
