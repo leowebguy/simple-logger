@@ -1,10 +1,11 @@
 <?php
 /**
- * Collect brief logs from exception handlers and report
+ * Collect brief exception handlers and send daily reports
  *
  * @author     Leo Leoncio
+ * @author     Ivan Pinheiro
  * @see        https://github.com/leowebguy
- * @copyright  Copyright (c) 2022, leowebguy
+ * @copyright  Copyright (c) 2023, leowebguy
  * @license    MIT
  */
 

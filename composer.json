@@ -1,6 +1,6 @@
 {
   "name": "leowebguy/simple-logger",
-  "description": "Collect brief logs from exception handlers and report",
+  "description": "Collect brief exception handlers and send daily reports",
   "keywords": [
     "craftcms",
     "plugin",
@@ -22,7 +22,7 @@
     }
   ],
   "require": {
-    "craftcms/cms": "^4.0",
+    "craftcms/cms": "^4.2",
     "monolog/monolog": "^2.7.0",
     "php": "^8.0"
   },
@@ -41,10 +41,7 @@
     "handle": "simple-logger",
     "hasCpSection": false,
     "hasCpSettings": false,
-    "class": "leowebguy\\simplelogger\\SimpleLogger",
-    "components": {
-      "loggerService": "leowebguy\\simplelogger\\services\\LoggerService"
-    }
+    "class": "leowebguy\\simplelogger\\SimpleLogger"
   },
   "config": {
     "platform": {

@@ -3,49 +3,32 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="x-apple-disable-message-reformatting">
-    <style>
-        table {
-            border-collapse: collapse;
-            border-spacing: 0;
-            width: 50%;
-            border: 1px solid #ddd;
-            margin-left: 5%;
-            margin-right: auto;
-        }
-
-        th, td {
-            text-align: left;
-            padding: 8px;
-        }
-        .title-table {
-            font-weight: 700;
-        }
-        .description-table {
-            margin-left: 5%;
-            font-size: 16px;
-        }
-        tr:nth-child(even){background-color: #f2f2f2}
-    </style>
     <title></title>
-    
+    <style>
+        html, body {font-size: 16px;-webkit-text-size-adjust: 100%;height: 100%;font-family: system-ui, BlinkMacSystemFont, -apple-system, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;}  body {margin: 0;padding: 0;background-color: hsl(212, 60%, 97%);color: hsl(209, 18%, 30%);display: flex;}  * {-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;}  h3, h4, p {margin-top: 0;margin-bottom: 12px;}  h3 {font-size: 1.6rem;}  h4 {font-size: 1.2rem;}  a {text-decoration: none;}  small {font-size: .7rem;}  .email {padding: 22px;}
+    </style>
 </head>
-    <body>
-        <div style="overflow-x:auto;">
-            <table>
-                <tbody>
-                    <tr>
-                        <td class="title-table"><span>Download and open the attachment to view the last day log errors</span></td>
-                    </tr>
-                    <tr>
-                        <td class="title-table"><span>Log Error Information Date {{ "now"|date("m/d/Y") }}</span></td>
-                    </tr>
-                    <tr>
-                        <td class="title-table"><span>Send by Simple Logger</span></td>
-                    </tr>
-                </tbody>
-            </table>                        
-        </div>
-    </body>
+<body>
+<div style="max-width: 760px;">
+    <div class="email" style="padding: 22px;">
+        <!-- start content -->
+
+        <h4>{{ 'Simple Logger Exceptions reports'|t }},</h4>
+
+        <br>
+
+        <p>{{ 'Find attached Simple Logger Exceptions report in JSON format from previous day.'|t }}</p>
+
+        <br><br>
+
+        <small>{{ 'Simple Logger' }}</small>
+
+        <br><br><br><br>&nbsp;
+
+        <!-- end content -->
+    </div>
+</div>
+</body>
 </html>
