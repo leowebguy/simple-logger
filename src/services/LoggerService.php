@@ -22,9 +22,11 @@ use craft\base\Plugin;
 use craft\console\controllers\UsersController;
 use craft\elements\User;
 use craft\helpers\App;
+use craft\helpers\Queue;
 use craft\helpers\FileHelper;
 use craft\helpers\Json;
 use leowebguy\simplelogger\handlers\SimpleHandler;
+use leowebguy\simplelogger\jobs\EmailJob;
 use yii\base\ErrorException;
 use yii\base\Exception as BaseException;
 use yii\base\InvalidConfigException;
@@ -134,7 +136,12 @@ class LoggerService extends Component
         foreach ($recipients as $recipient) {
 
             try { 
-                $this->sendMail($html, $subject, $recipient);
+                // $this->sendMail($html, $subject, $recipient);
+                Queue::push(new EmailJob([
+                    'html' => $html,
+                    'subject' => $subject,
+                    'mail' => $recipient,
+                ]), 11);
             } catch (Exception $e) {
                 echo Craft::error($e->getMessage(), __METHOD__);
                 return; // << do not throw, prevent loop
@@ -150,15 +157,14 @@ class LoggerService extends Component
      * @throws InvalidConfigException
      */
     public function sendMail(string $html, string $subject, $mail): void
-    {
-        $attachLogFile = Craft::$app->path->getLogPath() . '/email-log/simplelogger.log';
+    {   
+        $logFile = Craft::$app->path->getLogPath() . '/email-log/simplelogger.log';
         $mailer = Craft::$app->getMailer()->compose()
             ->setTo($mail)
             ->setSubject($subject)
-            ->setHtmlBody($html)
-            ->attach($attachLogFile);
+            ->setHtmlBody($html);
             if($mailer->send()){
-                unlink($attachLogFile);
+                @file_put_contents($logFile, '[]');
             }
     }
 

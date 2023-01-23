@@ -13,24 +13,47 @@ namespace leowebguy\simplelogger\jobs;
 use craft\queue\BaseJob;
 use leowebguy\simplelogger\SimpleLogger;
 
-class ReportJob extends BaseJob
+class EmailJob extends BaseJob
 {
-    public mixed $data;
+    public mixed $html;
+    public mixed $subject;
+    public mixed $mail;
 
     /**
      * @param $args
      */
     public function __construct($args)
     {
-        $this->data = $args['data'];
+
+        $this->html = $args['html'];
+        $this->subject = $args['subject'];
+        $this->mail = $args['mail'];
+
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function getSubject()
+    {
+        return $this->subject;
     }
 
     /**
      * @return mixed
      */
-    public function getData()
+    public function getHtml()
     {
-        return $this->data;
+        return $this->html;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMail()
+    {
+        return $this->mail;
     }
 
     /**
@@ -47,6 +70,8 @@ class ReportJob extends BaseJob
      */
     public function execute($queue): void
     {
-        SimpleLogger::getInstance()->loggerService->sendToSplunk($this->getData());
+        SimpleLogger::getInstance()->loggerService->sendMail($this->html, $this->subject, $this->mail);
+
+
     }
 }

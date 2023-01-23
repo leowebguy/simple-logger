@@ -77,7 +77,7 @@ class SimpleLogger extends Plugin
                         $currentDay = date("d",strtotime($date));
                         $hourDay = ltrim(date("h",strtotime($date)), '0');;
                         // check 8am - 9am
-                        if (@file_exists($logfile) && ( $currentDay > $dayLog  &&  in_array($hourDay, array('8', '9') ))) {
+                        if (@file_exists($logfile) && ($currentDay > $dayLog && $hourDay > 8)) {
                             
                             $this->loggerService->sendReport();
                             @file_put_contents($logfile, $date);
