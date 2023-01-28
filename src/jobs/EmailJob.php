@@ -1,6 +1,6 @@
 <?php
 /**
- * Collect brief exception handlers and send daily reports
+ * Collect brief exceptions and send daily reports
  *
  * @author     Leo Leoncio
  * @author     Ivan Pinheiro
@@ -32,6 +32,6 @@ class EmailJob extends BaseJob
      */
     public function execute($queue): void
     {
-        SimpleLogger::getInstance()->loggerService->sendMail($this->to);
+        SimpleLogger::$plugin->loggerService->sendMail($this->to);
     }
 }

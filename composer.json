@@ -1,6 +1,6 @@
 {
   "name": "leowebguy/simple-logger",
-  "description": "Collect brief exception handlers and send daily reports",
+  "description": "Collect brief exceptions and send daily reports",
   "keywords": [
     "craftcms",
     "plugin",
@@ -10,7 +10,7 @@
     "report",
     "monolog"
   ],
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "craft-plugin",
   "license": "MIT",
   "minimum-stability": "dev",
@@ -24,7 +24,7 @@
   "require": {
     "craftcms/cms": "^4.2",
     "monolog/monolog": "^2.7.0",
-    "php": "^8.0"
+    "php": "^8.0.2"
   },
   "require-dev": {
     "craftcms/ecs": "dev-main",

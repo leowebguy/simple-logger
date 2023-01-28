@@ -1,6 +1,6 @@
 <?php
 /**
- * Collect brief exception handlers and send daily reports
+ * Collect brief exceptions and send daily reports
  *
  * @author     Leo Leoncio
  * @author     Ivan Pinheiro
@@ -17,24 +17,16 @@ use leowebguy\simplelogger\SimpleLogger;
 
 class SimpleHandler extends AbstractProcessingHandler
 {
-    // Properties
-    // =========================================================================
-
-    public string $code = '';
-
     // Public Methods
     // =========================================================================
 
     /**
      * @param int $level
      * @param bool $bubble
-     * @param string $code
      */
-    public function __construct(int $level = Logger::ERROR, bool $bubble = true, string $code = '')
+    public function __construct(int $level = Logger::ERROR, bool $bubble = true)
     {
         parent::__construct($level, $bubble);
-
-        $this->code = $code;
     }
 
     /**
@@ -43,12 +35,11 @@ class SimpleHandler extends AbstractProcessingHandler
      */
     public function write(array $record): void
     {
-        SimpleLogger::getInstance()->loggerService->writeException(
+        SimpleLogger::$plugin->loggerService->writeException(
             [
                 "time" => $record["datetime"]->format('Y-m-d H:i:s'),
                 //"host" => preg_replace('/https?:\/\//', '', $record["channel"]),
                 //"source" => "Exception",
-                "code" => $this->code,
                 //"level" => $record["level"],
                 "sourcetype" => "Exception " . $record["level"],
                 "level_name" => $record["level_name"],

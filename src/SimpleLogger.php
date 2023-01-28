@@ -1,6 +1,6 @@
 <?php
 /**
- * Collect brief exception handlers and send daily reports
+ * Collect brief exceptions and send daily reports
  *
  * @author     Leo Leoncio
  * @author     Ivan Pinheiro
@@ -26,6 +26,8 @@ class SimpleLogger extends Plugin
     // Properties
     // =========================================================================
 
+    public static $plugin;
+
     public bool $hasCpSection = false;
 
     public bool $hasCpSettings = false;
@@ -36,6 +38,7 @@ class SimpleLogger extends Plugin
     public function init()
     {
         parent::init();
+        self::$plugin = $this;
 
         if (!$this->isInstalled) {
             return;
@@ -45,43 +48,47 @@ class SimpleLogger extends Plugin
             'loggerService' => LoggerService::class
         ]);
 
-        if (App::env('LOGGER_ON')) {
-            Event::on(
-                ErrorHandler::class,
-                ErrorHandler::EVENT_BEFORE_HANDLE_EXCEPTION,
-                function(ExceptionEvent $event) {
 
-                    // Check if status code !== (400, 404)
-                    if (preg_match("/(404)/i", $event->exception->getCode())) {
-                        return;
-                    }
+        Event::on(
+            ErrorHandler::class,
+            ErrorHandler::EVENT_BEFORE_HANDLE_EXCEPTION,
+            function(ExceptionEvent $event) {
 
-                    // Write Log Exception
-                    $this->loggerService->handleException($event->exception);
-
-                    // Test only
-                    //$this->loggerService->sendReport();
-
-                    // Write text for email one time a day
-                    $logfile = Craft::$app->path->getLogPath() . '/simplelogger';
-
-                    if (!@file_exists($logfile)) {
-                        @file_put_contents($logfile, '.');
-                    }
-
-                    $date = date("Y-m-d H:i:s");
-                    $dayLog = date('d', filemtime($logfile));
-                    $currentDay = date("d", strtotime($date));
-                    $hourDay = ltrim(date("h", strtotime($date)), '0');;
-
-                    // Check if there's new data, if next day and after 8am
-                    if (@file_exists($logfile) && ($currentDay > $dayLog && $hourDay > 8)) {
-                        $this->loggerService->sendReport();
-                        @file_put_contents($logfile, '.');
-                    }
+                // Only if active
+                if (!App::env('LOGGER_ON')) {
+                    return;
                 }
-            );
-        }
+
+                // Skip non-critical exceptions
+                if (preg_match("/(NotFoundHttpException)/i", $event->exception)) {
+                    return;
+                }
+
+                // Write Log Exception
+                $this->loggerService->handleException($event->exception);
+
+                // Test only
+                //$this->loggerService->sendReport();
+
+                // Write text for email one time a day
+                $logfile = Craft::$app->path->getLogPath() . '/simplelogger';
+
+                if (!@file_exists($logfile)) {
+                    @file_put_contents($logfile, '.');
+                }
+
+                $date = date("Y-m-d H:i:s");
+                $dayLog = date('d', filemtime($logfile));
+                $currentDay = date("d", strtotime($date));
+                $hourDay = ltrim(date("h", strtotime($date)), '0');
+
+                // Check if there's new data, if next day and after 8am
+                if (@file_exists($logfile) && ($currentDay > $dayLog && $hourDay > 8)) {
+                    $this->loggerService->sendReport();
+                    @file_put_contents($logfile, '.');
+                }
+            }
+        );
 
         /**
          * Plugin templates

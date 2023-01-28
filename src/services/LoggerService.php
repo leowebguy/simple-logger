@@ -1,6 +1,6 @@
 <?php
 /**
- * Collect brief exception handlers and send daily reports
+ * Collect brief exceptions and send daily reports
  *
  * @author     Leo Leoncio
  * @author     Ivan Pinheiro
@@ -42,7 +42,7 @@ class LoggerService extends Component
      */
     public function handleException($exception): void
     {
-        $handler = new SimpleHandler(Logger::ERROR, true, $exception->getCode());
+        $handler = new SimpleHandler(Logger::ERROR, true);
         $handler->setFormatter(new LineFormatter('Y-m-d H:i:s'));
         $local = new Logger(Craft::$app->sites->currentSite->name);
         $local->pushHandler($handler);
@@ -139,8 +139,8 @@ class LoggerService extends Component
         $mailer = Craft::$app->getMailer()->compose()
             ->setTo($to)
             ->setSubject($subject)
+            //->attach($logfile)
             ->setHtmlBody($html);
-            //->attach($logfile);
 
         // Clear log
         if ($mailer->send()) {
