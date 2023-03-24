@@ -56,19 +56,17 @@ class LoggerService extends Component
      */
     public function writeException($data): void
     {
-        $path = Craft::$app->path->getLogPath();
+        $logfile = Craft::$app->path->getLogPath() . '/simplelogger.json';
 
-        $logfile = 'simplelogger.json';
-
-        if (!@file_exists($path . '/' . $logfile)) {
-            @file_put_contents($path . '/' . $logfile, '[]');
+        if (!@file_exists($logfile)) {
+            @file_put_contents($logfile, '[]');
         }
 
-        $json = @file_get_contents($path . '/' . $logfile);
+        $json = @file_get_contents($logfile);
 
         $array = Json::decode($json);
         $array[] = $data;
-        @file_put_contents($path . '/' . $logfile, Json::encode($array));
+        @file_put_contents($logfile, Json::encode($array));
     }
 
     /**
