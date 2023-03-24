@@ -58,17 +58,17 @@ class LoggerService extends Component
     {
         $path = Craft::$app->path->getLogPath();
 
-        $logfile = '/simplelogger.json';
+        $logfile = 'simplelogger.json';
 
-        if (!@file_exists($path . $logfile)) {
-            @file_put_contents($path . $logfile, '[]');
+        if (!@file_exists($path . '/' . $logfile)) {
+            @file_put_contents($path . '/' . $logfile, '[]');
         }
 
-        $json = @file_get_contents($path . $logfile);
+        $json = @file_get_contents($path . '/' . $logfile);
 
         $array = Json::decode($json);
         $array[] = $data;
-        @file_put_contents($path . $logfile, Json::encode($array));
+        @file_put_contents($path . '/' . $logfile, Json::encode($array));
     }
 
     /**

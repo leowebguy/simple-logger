@@ -10,7 +10,7 @@
     "report",
     "monolog"
   ],
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "craft-plugin",
   "license": "MIT",
   "minimum-stability": "dev",
@@ -39,8 +39,6 @@
   "extra": {
     "name": "Simple Logger",
     "handle": "simple-logger",
-    "hasCpSection": false,
-    "hasCpSettings": false,
     "class": "leowebguy\\simplelogger\\SimpleLogger"
   },
   "config": {

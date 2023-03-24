@@ -48,7 +48,6 @@ class SimpleLogger extends Plugin
             'loggerService' => LoggerService::class
         ]);
 
-
         Event::on(
             ErrorHandler::class,
             ErrorHandler::EVENT_BEFORE_HANDLE_EXCEPTION,
@@ -90,9 +89,6 @@ class SimpleLogger extends Plugin
             }
         );
 
-        /**
-         * Plugin templates
-         */
         Event::on(
             View::class,
             View::EVENT_REGISTER_CP_TEMPLATE_ROOTS,
@@ -101,9 +97,6 @@ class SimpleLogger extends Plugin
             }
         );
 
-        /**
-         * Log info
-         */
         Craft::info(
             'Simple Logger plugin loaded',
             __METHOD__

@@ -21,7 +21,7 @@
             <thead>
             <tr>
                 <td>{{ 'time'|t }}</td>
-                <td>{{ 'code'|t }}</td>
+                {# <td>{{ 'code'|t }}</td> #}
                 <td>{{ 'level_name'|t }}</td>
                 <td>{{ 'sourcetype'|t }}</td>
                 <td>{{ 'message'|t }}</td>
@@ -31,7 +31,7 @@
             {% for log in logs %}
                 <tr>
                     <td>{{ log.time }}</td>
-                    <td>{{ log.code }}</td>
+                    {# <td>{{ log.code }}</td> #}
                     <td>{{ log.level_name }}</td>
                     <td>{{ log.sourcetype }}</td>
                     <td>{{ log.message }}</td>
