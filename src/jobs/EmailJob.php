@@ -3,10 +3,8 @@
  * Collect brief exceptions and send daily reports
  *
  * @author     Leo Leoncio
- * @author     Ivan Pinheiro
  * @see        https://github.com/leowebguy
- * @copyright  Copyright (c) 2023, leowebguy
- * @license    MIT
+ * @copyright  Copyright (c) 2024, leowebguy
  */
 
 namespace leowebguy\simplelogger\jobs;
@@ -18,20 +16,13 @@ class EmailJob extends BaseJob
 {
     public array $to;
 
-    /**
-     * @return string
-     */
     public function defaultDescription(): string
     {
         return 'Sending Simple Logger Report';
     }
 
-    /**
-     * @param $queue
-     * @return void
-     */
     public function execute($queue): void
     {
-        SimpleLogger::$plugin->loggerService->sendMail($this->to);
+        SimpleLogger::getInstance()->loggerService->sendMail($this->to);
     }
 }

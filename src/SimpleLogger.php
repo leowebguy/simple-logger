@@ -3,10 +3,8 @@
  * Collect brief exceptions and send daily reports
  *
  * @author     Leo Leoncio
- * @author     Ivan Pinheiro
  * @see        https://github.com/leowebguy
- * @copyright  Copyright (c) 2023, leowebguy
- * @license    MIT
+ * @copyright  Copyright (c) 2024, leowebguy
  */
 
 namespace leowebguy\simplelogger;
@@ -23,22 +21,13 @@ use yii\base\Event;
 
 class SimpleLogger extends Plugin
 {
-    // Properties
-    // =========================================================================
-
-    public static $plugin;
-
     public bool $hasCpSection = false;
 
     public bool $hasCpSettings = false;
 
-    // Public Methods
-    // =========================================================================
-
     public function init()
     {
         parent::init();
-        self::$plugin = $this;
 
         if (!$this->isInstalled) {
             return;

@@ -3,28 +3,26 @@
  * Collect brief exceptions and send daily reports
  *
  * @author     Leo Leoncio
- * @author     Ivan Pinheiro
  * @see        https://github.com/leowebguy
- * @copyright  Copyright (c) 2023, leowebguy
- * @license    MIT
+ * @copyright  Copyright (c) 2024, leowebguy
  */
 
 namespace leowebguy\simplelogger\services;
 
 use Craft;
-use Exception;
-use Monolog\Formatter\LineFormatter;
-use Monolog\Logger;
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
 use craft\base\Component;
 use craft\elements\User;
 use craft\helpers\App;
 use craft\helpers\Json;
 use craft\helpers\Queue;
+use Exception;
 use leowebguy\simplelogger\handlers\SimpleHandler;
 use leowebguy\simplelogger\jobs\EmailJob;
+use Monolog\Formatter\LineFormatter;
+use Monolog\Logger;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 use yii\base\Exception as BaseException;
 use yii\base\InvalidConfigException;
 
@@ -33,9 +31,6 @@ use yii\base\InvalidConfigException;
  */
 class LoggerService extends Component
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @param $exception
      * @return void
@@ -51,8 +46,8 @@ class LoggerService extends Component
 
     /**
      * @param $data
-     * @return void
      * @throws BaseException
+     * @return void
      */
     public function writeException($data): void
     {
@@ -70,6 +65,7 @@ class LoggerService extends Component
     }
 
     /**
+     * @throws BaseException
      * @return void
      */
     public function sendReport(): void
@@ -104,17 +100,14 @@ class LoggerService extends Component
         }
     }
 
-    // Private Methods
-    // =========================================================================
-
     /**
      * @param $to
-     * @return void
      * @throws BaseException
      * @throws InvalidConfigException
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
+     * @return void
      */
     public function sendMail($to): void
     {

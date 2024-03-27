@@ -44,7 +44,7 @@ exceptions, saving into a custom log file `storage/logs/simplelogger.json`
 
 Using the same event above, Simple Logger will once a day (after 8pm) collect the report and send an email to `LOGGER_EMAIL` defined recipient
 
-![report](readme/report.png)
+![report](resources/report.png)
 
 Simple Logger won't collect `NotFoundHttpException` exceptions, mostly related to inexistent pages or resources
 

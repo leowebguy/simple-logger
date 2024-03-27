@@ -3,23 +3,18 @@
  * Collect brief exceptions and send daily reports
  *
  * @author     Leo Leoncio
- * @author     Ivan Pinheiro
  * @see        https://github.com/leowebguy
- * @copyright  Copyright (c) 2023, leowebguy
- * @license    MIT
+ * @copyright  Copyright (c) 2024, leowebguy
  */
 
 namespace leowebguy\simplelogger\handlers;
 
+use leowebguy\simplelogger\SimpleLogger;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
-use leowebguy\simplelogger\SimpleLogger;
 
 class SimpleHandler extends AbstractProcessingHandler
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @param int $level
      * @param bool $bubble
@@ -35,7 +30,7 @@ class SimpleHandler extends AbstractProcessingHandler
      */
     public function write(array $record): void
     {
-        SimpleLogger::$plugin->loggerService->writeException(
+        SimpleLogger::getInstance()->loggerService->writeException(
             [
                 "time" => $record["datetime"]->format('Y-m-d H:i:s'),
                 //"host" => preg_replace('/https?:\/\//', '', $record["channel"]),
