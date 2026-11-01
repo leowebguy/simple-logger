@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Collect brief exceptions and send daily reports
  *
@@ -19,7 +20,9 @@ use Exception;
 use leowebguy\simplelogger\handlers\SimpleHandler;
 use leowebguy\simplelogger\jobs\EmailJob;
 use Monolog\Formatter\LineFormatter;
+use Monolog\Level;
 use Monolog\Logger;
+use Throwable;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -27,39 +30,54 @@ use yii\base\Exception as BaseException;
 use yii\base\InvalidConfigException;
 
 /**
- * @property-read array $adminEmails
+ * @property-read array<string, string> $adminEmails
  */
 class LoggerService extends Component
 {
     /**
-     * @param $exception
+     * @param mixed $exception
      * @return void
      */
-    public function handleException($exception): void
+    public function handleException(mixed $exception): void
     {
-        $handler = new SimpleHandler(Logger::ERROR, true);
-        $handler->setFormatter(new LineFormatter('Y-m-d H:i:s'));
-        $local = new Logger(Craft::$app->sites->currentSite->name);
+        $handler = new SimpleHandler(Level::Error, true);
+        $handler->setFormatter(new LineFormatter(null, 'Y-m-d H:i:s'));
+        $siteName = Craft::$app->getSites()->getCurrentSite()->name;
+        $local = new Logger($siteName);
         $local->pushHandler($handler);
-        $local->error($exception);
+
+        if ($exception instanceof Throwable) {
+            $local->error((string)$exception);
+        } elseif (is_string($exception)) {
+            $local->error($exception);
+        } else {
+            $local->error((string)json_encode($exception));
+        }
     }
 
     /**
-     * @param $data
+     * @param array<string, mixed> $data
      * @throws BaseException
      * @return void
      */
-    public function writeException($data): void
+    public function writeException(array $data): void
     {
-        $logfile = Craft::$app->path->getLogPath() . '/simplelogger.json';
+        $logfile = Craft::$app->getPath()->getLogPath() . '/simplelogger.json';
 
         if (!@file_exists($logfile)) {
             @file_put_contents($logfile, '[]');
         }
 
         $json = @file_get_contents($logfile);
+        if ($json === false) {
+            $json = '[]';
+        }
 
+        /** @var mixed $array */
         $array = Json::decode($json);
+        if (!is_array($array)) {
+            $array = [];
+        }
         $array[] = $data;
         @file_put_contents($logfile, Json::encode($array));
     }
@@ -70,29 +88,34 @@ class LoggerService extends Component
      */
     public function sendReport(): void
     {
+        /** @var array<string, string> $to */
         $to = [];
-        $rec = explode(',', preg_replace('/\s+/', '', App::env('LOGGER_EMAIL') ?? ''));
+        $envEmail = App::env('LOGGER_EMAIL');
+        $cleanEmail = is_string($envEmail) ? preg_replace('/\s+/', '', $envEmail) : '';
+        $rec = !empty($cleanEmail) ? explode(',', $cleanEmail) : [];
 
         // array(1) { ["aaa@gmail.com"]=> string(0) "" }
-        if (count($rec) == 1 && !empty($rec[0])) {
+        if (count($rec) === 1 && !empty($rec[0])) {
             $to[$rec[0]] = '';
         }
 
         // array(1) { ["aaa@gmail.com"]=> string(0) "" }
-        if (empty($rec[0])) {
+        if (empty($rec)) {
             $to = $this->getAdminEmails();
         }
 
         // array(2) { ["aaa@gmail.com"]=> string(0) "" ["bbb@gmail.com"]=> string(0) "" }
         if (count($rec) > 1) {
             foreach ($rec as $r) {
-                $to[$r] = '';
+                if (!empty($r)) {
+                    $to[$r] = '';
+                }
             }
         }
 
         try {
             Queue::push(new EmailJob([
-                'to' => $to
+                'to' => $to,
             ]));
         } catch (Exception $e) {
             Craft::error($e->getMessage(), __METHOD__);
@@ -101,7 +124,7 @@ class LoggerService extends Component
     }
 
     /**
-     * @param $to
+     * @param array<string, string> $to
      * @throws BaseException
      * @throws InvalidConfigException
      * @throws LoaderError
@@ -109,20 +132,23 @@ class LoggerService extends Component
      * @throws SyntaxError
      * @return void
      */
-    public function sendMail($to): void
+    public function sendMail(array $to): void
     {
-        $logfile = Craft::$app->path->getLogPath() . '/simplelogger.json';
+        $logfile = Craft::$app->getPath()->getLogPath() . '/simplelogger.json';
 
         if (!@file_exists($logfile)) {
             Craft::error('Can\'t find ' . $logfile, __METHOD__);
-            die();
+            return;
         }
 
         $json = @file_get_contents($logfile);
+        if ($json === false) {
+            $json = '[]';
+        }
         $logs = Json::decode($json);
 
         // Set subject
-        $subject = 'Simple Logger Report | ' . date("m-d");
+        $subject = 'Simple Logger Report | ' . date('m-d');
 
         // Template for send Email Log
         $html = Craft::$app->getView()->renderTemplate('_simplelogger/email', ['logs' => $logs]);
@@ -130,7 +156,6 @@ class LoggerService extends Component
         $mailer = Craft::$app->getMailer()->compose()
             ->setTo($to)
             ->setSubject($subject)
-            //->attach($logfile)
             ->setHtmlBody($html);
 
         // Clear log
@@ -140,18 +165,22 @@ class LoggerService extends Component
     }
 
     /**
-     * @return array
+     * @return array<string, string>
      */
     private function getAdminEmails(): array
     {
+        /** @var User[] $admins */
         $admins = User::find()
             ->admin()
             ->all();
 
         $to = [];
         foreach ($admins as $admin) {
-            $to[$admin->email] = '';
+            if ($admin->email) {
+                $to[$admin->email] = '';
+            }
         }
+
         return $to;
     }
 }

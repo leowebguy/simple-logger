@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Collect brief exceptions and send daily reports
  *
@@ -19,13 +20,17 @@ use craft\web\View;
 use leowebguy\simplelogger\services\LoggerService;
 use yii\base\Event;
 
+/**
+ * @method static SimpleLogger|null getInstance()
+ * @property LoggerService $loggerService
+ */
 class SimpleLogger extends Plugin
 {
     public bool $hasCpSection = false;
 
     public bool $hasCpSettings = false;
 
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -34,13 +39,13 @@ class SimpleLogger extends Plugin
         }
 
         $this->setComponents([
-            'loggerService' => LoggerService::class
+            'loggerService' => LoggerService::class,
         ]);
 
         Event::on(
             ErrorHandler::class,
             ErrorHandler::EVENT_BEFORE_HANDLE_EXCEPTION,
-            function(ExceptionEvent $event) {
+            function (ExceptionEvent $event): void {
 
                 // Only if active
                 if (!App::env('LOGGER_ON')) {
@@ -48,27 +53,25 @@ class SimpleLogger extends Plugin
                 }
 
                 // Skip non-critical exceptions
-                if (preg_match("/(NotFoundHttpException)/i", $event->exception)) {
+                if (preg_match('/(NotFoundHttpException)/i', (string)$event->exception)) {
                     return;
                 }
 
                 // Write Log Exception
                 $this->loggerService->handleException($event->exception);
 
-                // Test only
-                //$this->loggerService->sendReport();
-
                 // Write text for email one time a day
-                $logfile = Craft::$app->path->getLogPath() . '/simplelogger';
+                $logfile = Craft::$app->getPath()->getLogPath() . '/simplelogger';
 
                 if (!@file_exists($logfile)) {
                     @file_put_contents($logfile, '.');
                 }
 
-                $date = date("Y-m-d H:i:s");
-                $dayLog = date('d', filemtime($logfile));
-                $currentDay = date("d", strtotime($date));
-                $hourDay = ltrim(date("h", strtotime($date)), '0');
+                $now = time();
+                $mtime = @filemtime($logfile);
+                $dayLog = $mtime !== false ? date('d', $mtime) : '0';
+                $currentDay = date('d', $now);
+                $hourDay = (int)ltrim(date('h', $now), '0');
 
                 // Check if there's new data, if next day and after 8am
                 if (@file_exists($logfile) && ($currentDay > $dayLog && $hourDay > 8)) {
@@ -81,7 +84,7 @@ class SimpleLogger extends Plugin
         Event::on(
             View::class,
             View::EVENT_REGISTER_CP_TEMPLATE_ROOTS,
-            static function(RegisterTemplateRootsEvent $event) {
+            static function (RegisterTemplateRootsEvent $event): void {
                 $event->roots['_simplelogger'] = __DIR__ . '/templates';
             }
         );

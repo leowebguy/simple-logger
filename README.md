@@ -1,24 +1,30 @@
 Simple Logger plugin for Craft CMS
 ===
 
-Plugin for collecting exception handlers logs and reporting over email.
-A simple solution for those who can't or won't pay for corporate solution loggers like: New Relic, Dynatrace, Datadog and others.
+Plugin for collecting exception handler logs and reporting over email.
+A simple solution for those who can't or won't pay for corporate logging solutions like New Relic, Dynatrace, Datadog, and others.
+
+### Requirements
+
+This plugin requires:
+- Craft CMS `^5.0.0`
+- PHP `^8.2 || ^8.3 || ^8.4 || ^8.5`
 
 ### If you don't receive daily emails, check:
 
-1. if your email setup is correct
-2. if simple logger plugin is active
-3. if you have exceptions older than a day in `storage/logs/simplelogger.json`
+1. If your email setup is correct
+2. If Simple Logger plugin is active (`LOGGER_ON=1`)
+3. If you have exceptions in `storage/logs/simplelogger.json`
 
-### Install
+### Installation
 
 ```bash
-composer require leowebguy/simple-logger && php craft plugin/install simple-logger
+composer require leowebguy/simple-logger -w && php craft plugin/install simple-logger
 ```
 
 ### Usage
 
-Set these two `.env` parameters to make sure Simple Logger is active
+Set these `.env` parameters to configure Simple Logger:
 
 ```dotenv
 # Simple Logger
@@ -26,27 +32,47 @@ LOGGER_ON=1
 LOGGER_EMAIL=john@email.com
 ```
 
-`LOGGER_EMAIL` accept multiple emails `LOGGER_EMAIL=john@email.com,jane@@email.com`
+`LOGGER_EMAIL` accepts multiple comma-separated emails:
+```dotenv
+LOGGER_EMAIL=john@email.com,jane@email.com
+```
 
-The plugin will use the built-in craft event `EVENT_BEFORE_HANDLE_EXCEPTION` to handle
-exceptions, saving into a custom log file `storage/logs/simplelogger.json`
+If `LOGGER_EMAIL` is not set, Simple Logger defaults to sending the report to all Craft CMS administrators.
 
-```log
+The plugin listens to Craft's `ErrorHandler::EVENT_BEFORE_HANDLE_EXCEPTION` event to capture exceptions, logging them to `storage/logs/simplelogger.json`:
+
+```json
 [
-    {
-        "time": "2023-01-21 17:37:21",
-        "sourcetype": "Exception 400",
-        "level_name": "ERROR",
-        "message": "TwigErrorRuntimeError: Calling unknown method: craftwebtwigvariablesCraftVariable::deviceDetect1() in /var/www/html/templates/index.twig:10"
-    }
+  {
+    "time": "2026-11-01 17:37:21",
+    "sourcetype": "Exception 400",
+    "level_name": "ERROR",
+    "message": "Twig\\Error\\RuntimeError: Calling unknown method: craft\\web\\twig\\variables\\CraftVariable::deviceDetect1() in /var/www/html/templates/index.twig:10"
+  }
 ]
 ```
 
-Using the same event above, Simple Logger will once a day (after 8pm) collect the report and send an email to `LOGGER_EMAIL` defined recipient
+Once a day, Simple Logger processes the log file and queues a background email job (`EmailJob`) to the configured recipient(s).
 
 ![report](resources/report.png)
 
-Simple Logger won't collect `NotFoundHttpException` exceptions, mostly related to inexistent pages or resources
+Simple Logger automatically ignores `NotFoundHttpException` exceptions (such as 404s for nonexistent pages or missing static assets).
+
+### Development & Testing
+
+```bash
+# Run PHPStan Level 8 static analysis
+composer phpstan
+
+# Check PSR-12 code style
+composer pint-test
+
+# Auto-fix PSR-12 code style
+composer pint
+
+# Run Craft 5 Rector rules
+composer rector
+```
 
 ### Feeling creative?
 

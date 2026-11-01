@@ -10,25 +10,27 @@
     "report",
     "monolog"
   ],
-  "version": "2.0.0",
+  "version": "2.1.0",
   "type": "craft-plugin",
   "license": "proprietary",
   "minimum-stability": "dev",
   "prefer-stable": true,
-  "author": {
-    "name": "Leo",
-    "homepage": "https://github.com/leowebguy"
-  },
+  "authors": [
+    {
+      "name": "Leo",
+      "homepage": "https://github.com/leowebguy"
+    }
+  ],
   "require": {
-    "craftcms/cms": "^5.0",
-    "monolog/monolog": "^3.5.0",
-    "php": "^8.2"
+    "php": "^8.2 || ^8.3 || ^8.4 || ^8.5",
+    "craftcms/cms": "^5.0.0",
+    "monolog/monolog": "^3.5.0"
   },
   "require-dev": {
     "craftcms/ecs": "dev-main",
     "craftcms/phpstan": "dev-main",
     "craftcms/rector": "dev-main",
-    "laravel/pint": "^1.14.0"
+    "laravel/pint": "^1.14"
   },
   "autoload": {
     "psr-4": {
@@ -38,6 +40,9 @@
   "extra": {
     "name": "Simple Logger",
     "handle": "simple-logger",
+    "developer": "Leo",
+    "developerUrl": "https://github.com/leowebguy",
+    "documentationUrl": "https://github.com/leowebguy/simple-logger/blob/main/README.md",
     "class": "leowebguy\\simplelogger\\SimpleLogger"
   },
   "config": {
@@ -52,8 +57,10 @@
   "scripts": {
     "check-cs": "vendor/bin/ecs check src --ansi",
     "fix-cs": "vendor/bin/ecs check src --ansi --fix",
-    "phpstan": "vendor/bin/phpstan analyse src",
+    "phpstan": "vendor/bin/phpstan analyse",
+    "stan": "vendor/bin/phpstan analyse",
     "rector": "vendor/bin/rector process src --config vendor/craftcms/rector/sets/craft-cms-50.php",
-    "pint": "vendor/bin/pint -v src"
+    "pint": "vendor/bin/pint -v src",
+    "pint-test": "vendor/bin/pint --test -v src"
   }
 }
